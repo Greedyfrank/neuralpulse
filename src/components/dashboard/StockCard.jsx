@@ -2,6 +2,7 @@ import React from "react";
 import { TrendingUp, TrendingDown, ExternalLink } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import SparklineChart from "./SparklineChart";
 
 export default function StockCard({ stock }) {
   const isPositive = stock.change >= 0;
@@ -28,6 +29,12 @@ export default function StockCard({ stock }) {
           </p>
         </div>
       </div>
+
+      {stock.sparkline?.length > 0 && (
+        <div className="mb-2">
+          <SparklineChart data={stock.sparkline} isPositive={isPositive} />
+        </div>
+      )}
 
       <div className="flex items-center justify-between pt-3 border-t border-border">
         <div className="flex gap-3">

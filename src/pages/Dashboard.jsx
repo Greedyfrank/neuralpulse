@@ -10,11 +10,26 @@ import MarketSummary from "../components/dashboard/MarketSummary";
 import BrokerLinks from "../components/dashboard/BrokerLinks";
 import NewsSkeleton from "../components/dashboard/NewsSkeleton";
 import StocksSkeleton from "../components/dashboard/StocksSkeleton";
+import NewsFilter from "../components/dashboard/NewsFilter";
 
 const AI_STOCKS = [
   "NVDA", "MSFT", "GOOGL", "META", "AMZN", "AMD", "INTC",
   "PLTR", "CRM", "SNOW", "AI", "SMCI", "AVGO", "ORCL"
 ];
+
+function generateSparkline(currentPrice, changePercent) {
+  const points = 12;
+  const data = [];
+  // Work backwards to simulate intraday price movement
+  let price = currentPrice;
+  for (let i = points; i >= 0; i--) {
+    const noise = (Math.random() - 0.5) * currentPrice * 0.008;
+    const trend = (changePercent / 100) * currentPrice * (i / points) * 0.6;
+    data.unshift({ price: Math.max(0, price - trend + noise) });
+  }
+  data[data.length - 1] = { price: currentPrice };
+  return data;
+}
 
 export default function Dashboard() {
   const [stocks, setStocks] = useState([]);
@@ -22,6 +37,7 @@ export default function Dashboard() {
   const [loadingStocks, setLoadingStocks] = useState(true);
   const [loadingNews, setLoadingNews] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [newsTopic, setNewsTopic] = useState("all");
 
   const fetchStocks = useCallback(async () => {
     setLoadingStocks(true);
@@ -63,7 +79,11 @@ Use your best knowledge of recent market data. Make the prices realistic and cur
       },
       model: "gemini_3_flash"
     });
-    setStocks(result.stocks || []);
+    const enriched = (result.stocks || []).map((s) => ({
+      ...s,
+      sparkline: generateSparkline(s.price, s.change_percent),
+    }));
+    setStocks(enriched);
     setLoadingStocks(false);
     setLastUpdated(new Date());
   }, []);
@@ -82,7 +102,7 @@ For each article provide:
 - title (compelling headline)
 - summary (2-3 sentence summary)
 - source (news outlet name)
-- category (one of: "Earnings", "Regulation", "Technology", "Markets", "Deals", "Research")
+- category (one of: "Earnings", "Regulation", "AI Chips", "LLM Software", "Markets", "Deals", "Research")
 - time_ago (realistic time like "2h ago", "5h ago", "1d ago")
 - url (real URL to a major news source covering this topic, use real URLs from reuters.com, bloomberg.com, cnbc.com, techcrunch.com, theverge.com, etc.)`,
       add_context_from_internet: true,
@@ -184,13 +204,16 @@ For each article provide:
                 <Newspaper className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">AI News</h2>
               </div>
+              <NewsFilter selected={newsTopic} onChange={setNewsTopic} />
               {loadingNews ? (
                 <NewsSkeleton />
               ) : (
                 <div className="space-y-3">
-                  {news.map((article, i) => (
-                    <NewsCard key={i} article={article} />
-                  ))}
+                  {news
+                    .filter((a) => newsTopic === "all" || a.category === newsTopic)
+                    .map((article, i) => (
+                      <NewsCard key={i} article={article} />
+                    ))}
                 </div>
               )}
             </div>
