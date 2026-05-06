@@ -25,9 +25,9 @@ export default function NewsCard({ article }) {
           </p>
           <div className="flex items-center justify-between mt-2.5">
             <span className="text-[10px] text-muted-foreground font-medium">{article.source}</span>
-            {article.url && (
+            {article.source && (
               <a
-                href={article.url}
+                href={`https://www.google.com/search?q=${encodeURIComponent(article.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 font-medium transition-colors"
