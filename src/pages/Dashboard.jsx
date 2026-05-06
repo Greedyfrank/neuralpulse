@@ -13,6 +13,7 @@ import BrokerLinks from "../components/dashboard/BrokerLinks";
 import NewsSkeleton from "../components/dashboard/NewsSkeleton";
 import StocksSkeleton from "../components/dashboard/StocksSkeleton";
 import NewsFilter from "../components/dashboard/NewsFilter";
+import NewsSummary from "../components/dashboard/NewsSummary";
 
 const AI_STOCKS = [
   "NVDA", "MSFT", "GOOGL", "META", "AMZN", "AMD", "INTC",
@@ -207,6 +208,9 @@ For each article provide:
               <div className="flex items-center gap-2 mb-3">
                 <Newspaper className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider">AI News</h2>
+              </div>
+              <div className="mb-3">
+                <NewsSummary news={news} />
               </div>
               <NewsFilter selected={newsTopic} onChange={setNewsTopic} />
               {loadingNews ? (
