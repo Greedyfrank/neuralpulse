@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Zap, Newspaper, BarChart3 } from "lucide-react";
+import PriceAlertModal from "../components/dashboard/PriceAlertModal";
+import PriceAlertsPanel from "../components/dashboard/PriceAlertsPanel";
 
 import StockTicker from "../components/dashboard/StockTicker";
 import StockCard from "../components/dashboard/StockCard";
@@ -38,6 +40,8 @@ export default function Dashboard() {
   const [loadingNews, setLoadingNews] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [newsTopic, setNewsTopic] = useState("all");
+  const [alertStock, setAlertStock] = useState(null);
+  const [alertsRefresh, setAlertsRefresh] = useState(0);
 
   const fetchStocks = useCallback(async () => {
     setLoadingStocks(true);
@@ -192,7 +196,7 @@ For each article provide:
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                   {stocks.map((stock) => (
-                    <StockCard key={stock.symbol} stock={stock} />
+                    <StockCard key={stock.symbol} stock={stock} onSetAlert={setAlertStock} />
                   ))}
                 </div>
               )}
@@ -219,6 +223,9 @@ For each article provide:
             </div>
           </div>
 
+          {/* Price Alerts Panel */}
+          <PriceAlertsPanel refresh={alertsRefresh} />
+
           {/* Broker Links */}
           <div className="mt-6">
             <BrokerLinks />
@@ -233,6 +240,13 @@ For each article provide:
           </div>
         </div>
       </div>
+      {/* Price Alert Modal */}
+      <PriceAlertModal
+        stock={alertStock}
+        open={!!alertStock}
+        onClose={() => setAlertStock(null)}
+        onCreated={() => setAlertsRefresh((n) => n + 1)}
+      />
     </div>
   );
 }

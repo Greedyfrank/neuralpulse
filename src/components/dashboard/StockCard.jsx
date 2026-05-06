@@ -1,10 +1,10 @@
 import React from "react";
-import { TrendingUp, TrendingDown, ExternalLink } from "lucide-react";
+import { TrendingUp, TrendingDown, ExternalLink, Bell } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SparklineChart from "./SparklineChart";
 
-export default function StockCard({ stock }) {
+export default function StockCard({ stock, onSetAlert }) {
   const isPositive = stock.change >= 0;
 
   return (
@@ -47,11 +47,22 @@ export default function StockCard({ stock }) {
             <p className="font-mono text-xs text-foreground">{stock.volume}</p>
           </div>
         </div>
-        <a href={stock.buy_url} target="_blank" rel="noopener noreferrer">
-          <Button size="sm" className="h-7 text-[11px] gap-1 bg-primary hover:bg-primary/90">
-            Trade <ExternalLink className="w-3 h-3" />
+        <div className="flex items-center gap-1.5">
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 w-7 p-0 border-border hover:border-primary/40 hover:text-primary"
+            onClick={() => onSetAlert?.(stock)}
+            title="Set price alert"
+          >
+            <Bell className="w-3 h-3" />
           </Button>
-        </a>
+          <a href={stock.buy_url} target="_blank" rel="noopener noreferrer">
+            <Button size="sm" className="h-7 text-[11px] gap-1 bg-primary hover:bg-primary/90">
+              Trade <ExternalLink className="w-3 h-3" />
+            </Button>
+          </a>
+        </div>
       </div>
     </Card>
   );

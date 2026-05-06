@@ -1,0 +1,49 @@
+{
+  "name": "PriceAlert",
+  "type": "object",
+  "properties": {
+    "symbol": {
+      "type": "string",
+      "description": "Stock ticker symbol (e.g. NVDA)"
+    },
+    "stock_name": {
+      "type": "string",
+      "description": "Full company name"
+    },
+    "target_price": {
+      "type": "number",
+      "description": "Target price to trigger the alert"
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "above",
+        "below"
+      ],
+      "description": "Trigger when price goes above or below target"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email address to notify"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "triggered"
+      ],
+      "default": "active",
+      "description": "Alert status"
+    },
+    "triggered_at": {
+      "type": "string",
+      "description": "ISO timestamp when alert was triggered"
+    }
+  },
+  "required": [
+    "symbol",
+    "target_price",
+    "condition",
+    "email"
+  ]
+}
