@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Zap, Newspaper, BarChart3 } from "lucide-react";
+import { RefreshCw, Zap, Newspaper, BarChart3, Search, X } from "lucide-react";
 import PriceAlertModal from "../components/dashboard/PriceAlertModal";
 import PriceAlertsPanel from "../components/dashboard/PriceAlertsPanel";
 
@@ -41,6 +41,7 @@ export default function Dashboard() {
   const [loadingNews, setLoadingNews] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [newsTopic, setNewsTopic] = useState("all");
+  const [newsSearch, setNewsSearch] = useState("");
   const [alertStock, setAlertStock] = useState(null);
   const [alertsRefresh, setAlertsRefresh] = useState(0);
 
@@ -212,13 +213,33 @@ For each article provide:
               <div className="mb-3">
                 <NewsSummary news={news} />
               </div>
+              {/* Search bar */}
+              <div className="relative mb-3">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  value={newsSearch}
+                  onChange={(e) => setNewsSearch(e.target.value)}
+                  placeholder="Search headlines..."
+                  className="w-full bg-secondary/50 border border-border rounded-lg pl-8 pr-8 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+                />
+                {newsSearch && (
+                  <button
+                    onClick={() => setNewsSearch("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
               <NewsFilter selected={newsTopic} onChange={setNewsTopic} />
               {loadingNews ? (
                 <NewsSkeleton />
               ) : (
                 <div className="space-y-3">
                   {news
-                    .filter((a) => newsTopic === "all" || a.category === newsTopic)
+                    .filter((a) => (newsTopic === "all" || a.category === newsTopic) &&
+                      (!newsSearch || a.title?.toLowerCase().includes(newsSearch.toLowerCase()) || a.summary?.toLowerCase().includes(newsSearch.toLowerCase())))
                     .map((article, i) => (
                       <NewsCard key={i} article={article} />
                     ))}
