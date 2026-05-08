@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import Dashboard from './pages/Dashboard';
+import ProtectedRoute from '@/components/ProtectedRoute';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -34,7 +35,9 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      <Route element={<ProtectedRoute unauthenticatedElement={null} />}>
+        <Route path="/" element={<Dashboard />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

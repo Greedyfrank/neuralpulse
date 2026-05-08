@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, TrendingUp, TrendingDown } from "lucide-react";
 
 export default function PriceAlertModal({ stock, open, onClose, onCreated }) {
+  const { user } = useAuth();
   const [condition, setCondition] = useState("above");
   const [targetPrice, setTargetPrice] = useState(stock?.price ? String(Math.round(stock.price * 1.05)) : "");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(user?.email || "");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 

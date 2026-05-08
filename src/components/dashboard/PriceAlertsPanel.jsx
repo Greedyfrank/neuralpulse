@@ -18,7 +18,17 @@ export default function PriceAlertsPanel({ refresh }) {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   };
 
-  if (!alerts.length) return null;
+  if (!alerts.length) return (
+    <Card className="bg-card border-border p-4 mt-6">
+      <div className="flex items-center gap-2 mb-3">
+        <Bell className="w-4 h-4 text-primary" />
+        <h3 className="text-xs uppercase tracking-widest text-muted-foreground font-medium">Active Price Alerts</h3>
+      </div>
+      <p className="text-xs text-muted-foreground text-center py-4">
+        No active price alerts. Click the bell icon on any stock card to create one.
+      </p>
+    </Card>
+  );
 
   return (
     <Card className="bg-card border-border p-4 mt-6">
