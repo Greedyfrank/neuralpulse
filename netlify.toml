@@ -1,0 +1,16 @@
+# Netlify configuration for the NeuralPulse Vite + React app
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback: serve index.html for client-side routes so deep links / refresh don't 404
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Base44 apps read their App ID + backend URL from these build-time vars.
+# Set the real values in the Netlify UI (Site settings → Environment variables)
+# or via `netlify env:set`, otherwise the deployed app can't reach the backend.
+#   VITE_BASE44_APP_ID
+#   VITE_BASE44_APP_BASE_URL
