@@ -16,5 +16,23 @@ export default defineConfig({
       visualEditAgent: true
     }),
     react(),
-  ]
+  ],
+  build: {
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      output: {
+        // Split stable third-party code into its own cacheable chunks so that
+        // shipping an app change doesn't invalidate the (large) vendor bundle.
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (/[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/.test(id)) {
+            return 'react-vendor';
+          }
+          if (id.includes('@radix-ui')) return 'radix-vendor';
+          if (id.includes('lucide-react')) return 'icons';
+          return 'vendor';
+        }
+      }
+    }
+  }
 });

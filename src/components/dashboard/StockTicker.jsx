@@ -1,7 +1,7 @@
 import React from "react";
 import { TrendingUp, TrendingDown } from "lucide-react";
 
-export default function StockTicker({ stocks, loading }) {
+function StockTicker({ stocks, loading }) {
   if (loading || !stocks?.length) {
     return (
       <div className="w-full bg-secondary/50 border-b border-border py-2.5 overflow-hidden">
@@ -50,3 +50,5 @@ export default function StockTicker({ stocks, loading }) {
     </div>
   );
 }
+
+export default React.memo(StockTicker);

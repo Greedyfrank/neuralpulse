@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import SparklineChart from "./SparklineChart";
 
-export default function StockCard({ stock, onSetAlert }) {
+function StockCard({ stock, onSetAlert }) {
   const isPositive = stock.change >= 0;
 
   return (
@@ -67,3 +67,5 @@ export default function StockCard({ stock, onSetAlert }) {
     </Card>
   );
 }
+
+export default React.memo(StockCard);

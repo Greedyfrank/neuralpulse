@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Clock } from "lucide-react";
 
-export default function NewsCard({ article }) {
+function NewsCard({ article }) {
   return (
     <Card className="bg-card border-border p-4 hover:border-primary/40 transition-all duration-300 group">
       <div className="flex items-start gap-3">
@@ -41,3 +41,5 @@ export default function NewsCard({ article }) {
     </Card>
   );
 }
+
+export default React.memo(NewsCard);

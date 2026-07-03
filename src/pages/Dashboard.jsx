@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Zap, Newspaper, BarChart3, Search, X } from "lucide-react";
@@ -147,6 +147,17 @@ For each article provide:
     fetchNews();
   };
 
+  const filteredNews = useMemo(() => {
+    const q = newsSearch.trim().toLowerCase();
+    return news.filter(
+      (a) =>
+        (newsTopic === "all" || a.category === newsTopic) &&
+        (!q ||
+          a.title?.toLowerCase().includes(q) ||
+          a.summary?.toLowerCase().includes(q))
+    );
+  }, [news, newsTopic, newsSearch]);
+
   return (
     <div className="min-h-screen bg-background font-inter">
       {/* Ticker */}
@@ -237,12 +248,9 @@ For each article provide:
                 <NewsSkeleton />
               ) : (
                 <div className="space-y-3">
-                  {news
-                    .filter((a) => (newsTopic === "all" || a.category === newsTopic) &&
-                      (!newsSearch || a.title?.toLowerCase().includes(newsSearch.toLowerCase()) || a.summary?.toLowerCase().includes(newsSearch.toLowerCase())))
-                    .map((article, i) => (
-                      <NewsCard key={i} article={article} />
-                    ))}
+                  {filteredNews.map((article, i) => (
+                    <NewsCard key={article.url || article.title || i} article={article} />
+                  ))}
                 </div>
               )}
             </div>

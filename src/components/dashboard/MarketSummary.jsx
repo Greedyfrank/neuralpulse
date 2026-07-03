@@ -9,7 +9,7 @@ const stats = [
   { label: "Avg Volume", icon: BarChart3, key: "avg_volume" },
 ];
 
-export default function MarketSummary({ stocks }) {
+function MarketSummary({ stocks }) {
   if (!stocks?.length) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -79,3 +79,5 @@ export default function MarketSummary({ stocks }) {
     </div>
   );
 }
+
+export default React.memo(MarketSummary);
