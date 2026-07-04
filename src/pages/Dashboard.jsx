@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { fetchStocks as getStocks, fetchNews as getNews } from "@/lib/marketApi";
 import { Button } from "@/components/ui/button";
 import { RefreshCw, Zap, Newspaper, BarChart3, Search, X } from "lucide-react";
 import PriceAlertModal from "../components/dashboard/PriceAlertModal";
@@ -14,11 +14,6 @@ import NewsSkeleton from "../components/dashboard/NewsSkeleton";
 import StocksSkeleton from "../components/dashboard/StocksSkeleton";
 import NewsFilter from "../components/dashboard/NewsFilter";
 import NewsSummary from "../components/dashboard/NewsSummary";
-
-const AI_STOCKS = [
-  "NVDA", "MSFT", "GOOGL", "META", "AMZN", "AMD", "INTC",
-  "PLTR", "CRM", "SNOW", "AI", "SMCI", "AVGO", "ORCL"
-];
 
 function generateSparkline(currentPrice, changePercent) {
   const points = 12;
@@ -47,94 +42,31 @@ export default function Dashboard() {
 
   const fetchStocks = useCallback(async () => {
     setLoadingStocks(true);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a financial data assistant. Provide current approximate stock data for these AI-related companies: ${AI_STOCKS.join(", ")}.
-      
-For each stock, provide:
-- symbol (ticker)
-- name (company full name)
-- price (current approximate price in USD)
-- change (dollar change today, can be negative)
-- change_percent (percentage change today, can be negative)
-- market_cap (formatted string like "3.2T" or "450B")
-- volume (formatted string like "45M" or "1.2B")
-- buy_url (direct URL to buy this stock on Robinhood, format: https://robinhood.com/stocks/SYMBOL)
-
-Use your best knowledge of recent market data. Make the prices realistic and current.`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          stocks: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                symbol: { type: "string" },
-                name: { type: "string" },
-                price: { type: "number" },
-                change: { type: "number" },
-                change_percent: { type: "number" },
-                market_cap: { type: "string" },
-                volume: { type: "string" },
-                buy_url: { type: "string" }
-              }
-            }
-          }
-        }
-      },
-      model: "gemini_3_flash"
-    });
-    const enriched = (result.stocks || []).map((s) => ({
-      ...s,
-      sparkline: generateSparkline(s.price, s.change_percent),
-    }));
-    setStocks(enriched);
-    setLoadingStocks(false);
-    setLastUpdated(new Date());
+    try {
+      const result = await getStocks();
+      const enriched = result.map((s) => ({
+        ...s,
+        sparkline: generateSparkline(s.price, s.change_percent),
+      }));
+      setStocks(enriched);
+      setLastUpdated(new Date());
+    } catch (e) {
+      console.error("Failed to load stocks:", e);
+    } finally {
+      setLoadingStocks(false);
+    }
   }, []);
 
   const fetchNews = useCallback(async () => {
     setLoadingNews(true);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are an AI news aggregator. Provide the 10 most recent and important AI-related news stories from today or this week. Include news about:
-- AI company earnings & announcements (OpenAI, Google, Microsoft, NVIDIA, Meta, etc.)
-- AI regulation and policy
-- New AI model releases and breakthroughs
-- AI industry deals and partnerships
-- AI stock market movements
-
-For each article provide:
-- title (compelling headline)
-- summary (2-3 sentence summary)
-- source (news outlet name)
-- category (one of: "Earnings", "Regulation", "AI Chips", "LLM Software", "Markets", "Deals", "Research")
-- time_ago (realistic time like "2h ago", "5h ago", "1d ago")
-- url (real URL to a major news source covering this topic, use real URLs from reuters.com, bloomberg.com, cnbc.com, techcrunch.com, theverge.com, etc.)`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          articles: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                title: { type: "string" },
-                summary: { type: "string" },
-                source: { type: "string" },
-                category: { type: "string" },
-                time_ago: { type: "string" },
-                url: { type: "string" }
-              }
-            }
-          }
-        }
-      },
-      model: "gemini_3_flash"
-    });
-    setNews(result.articles || []);
-    setLoadingNews(false);
+    try {
+      const result = await getNews();
+      setNews(result);
+    } catch (e) {
+      console.error("Failed to load news:", e);
+    } finally {
+      setLoadingNews(false);
+    }
   }, []);
 
   useEffect(() => {

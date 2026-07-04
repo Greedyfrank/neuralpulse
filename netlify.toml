@@ -3,14 +3,16 @@
   command = "npm run build"
   publish = "dist"
 
-# SPA fallback: serve index.html for client-side routes so deep links / refresh don't 404
+# Serverless backend (Claude API). Requires the ANTHROPIC_API_KEY env var
+# to be set in the Netlify UI (Site settings -> Environment variables) or via
+# `netlify env:set ANTHROPIC_API_KEY <key>`.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# SPA fallback: serve index.html for client-side routes so deep links / refresh
+# don't 404. Netlify serves /.netlify/functions/* before this catch-all.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# Base44 apps read their App ID + backend URL from these build-time vars.
-# Set the real values in the Netlify UI (Site settings → Environment variables)
-# or via `netlify env:set`, otherwise the deployed app can't reach the backend.
-#   VITE_BASE44_APP_ID
-#   VITE_BASE44_APP_BASE_URL

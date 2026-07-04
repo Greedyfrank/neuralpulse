@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { listAlerts, deleteAlert } from "@/lib/priceAlerts";
 import { Card } from "@/components/ui/card";
 import { Bell, Trash2, TrendingUp, TrendingDown, CheckCircle2 } from "lucide-react";
 
 export default function PriceAlertsPanel({ refresh }) {
   const [alerts, setAlerts] = useState([]);
 
-  const load = async () => {
-    const data = await base44.entities.PriceAlert.list("-created_date", 20);
-    setAlerts(data);
+  const load = () => {
+    setAlerts(listAlerts());
   };
 
   useEffect(() => { load(); }, [refresh]);
 
-  const handleDelete = async (id) => {
-    await base44.entities.PriceAlert.delete(id);
+  const handleDelete = (id) => {
+    deleteAlert(id);
     setAlerts((prev) => prev.filter((a) => a.id !== id));
   };
 

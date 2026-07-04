@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { summarizeNews } from "@/lib/marketApi";
 import { Card } from "@/components/ui/card";
 import { Sparkles, RefreshCw } from "lucide-react";
 
@@ -10,18 +10,15 @@ export default function NewsSummary({ news }) {
   const summarize = async () => {
     if (!news?.length) return;
     setLoading(true);
-    const headlines = news.map((a) => a.title).join("\n");
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Here are today's top AI news headlines:\n${headlines}\n\nSummarize the 3 most important stories into concise, punchy bullet points (1 sentence each). Focus on what matters most to an investor or tech enthusiast.`,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          bullets: { type: "array", items: { type: "string" } }
-        }
-      }
-    });
-    setBullets(result.bullets || []);
-    setLoading(false);
+    try {
+      const titles = news.map((a) => a.title);
+      const bullets = await summarizeNews(titles);
+      setBullets(bullets);
+    } catch (e) {
+      console.error("Failed to summarize news:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
